@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"github.com/PalmerTurley34/pokedex/internal/pokeapi"
-	"log"
 )
 
 type pokedexCmd struct {
 	name string
 	desc string
-	callback func() error
+	callback func(*config) error
 }
 
 func getAllCommands() map[string]pokedexCmd {
@@ -40,40 +38,7 @@ func getAllCommands() map[string]pokedexCmd {
 	}
 }
 
-var allCommands map[string]pokedexCmd = getAllCommands()
 
-func helpCommand() error {
-	fmt.Print("\nAvailable Commands:\n\n")
-	for _, cmd := range getAllCommands() {
-		line := fmt.Sprintf("%s: %s", cmd.name, cmd.desc)
-		fmt.Println(line)
-	}
-	return nil
-}
-
-func exitCommand() error {
-	fmt.Println("\nGoodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func mapCommand() error {
-	pokeapiClient := pokeapi.NewClient()
-	resp, err := pokeapiClient.GetLocationAreas()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	fmt.Println("Location Areas:")
-	for _, area := range resp.Results {
-		fmt.Printf("Location: %v\n", area.Name)
-	} 
-	return nil
-}
-
-func mapbCommand() error {
-	return nil
-}
 
 func parseInput(input string) []string {
 	loweredInput := strings.ToLower(input)
@@ -81,7 +46,8 @@ func parseInput(input string) []string {
 	return words
 }
 
-func startREPL() {
+func startREPL(cfg *config) {
+	allCommands := getAllCommands()
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("\nWelcome to the Pokedex!")
 	fmt.Println("Type \"help\" for help")
@@ -95,7 +61,7 @@ func startREPL() {
 		}
 		command := parsedCmd[0]
 		if cmd, ok := allCommands[command]; ok {
-			err := cmd.callback()
+			err := cmd.callback(cfg)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
