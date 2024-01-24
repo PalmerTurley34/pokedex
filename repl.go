@@ -10,7 +10,7 @@ import (
 type pokedexCmd struct {
 	name     string
 	desc     string
-	callback func(*config) error
+	callback func(*config, []string) error
 }
 
 func getAllCommands() map[string]pokedexCmd {
@@ -34,6 +34,11 @@ func getAllCommands() map[string]pokedexCmd {
 			name:     "mapb",
 			desc:     "Shows the previous list of locations",
 			callback: mapbCommand,
+		},
+		"explore": {
+			name:     "explore",
+			desc:     "\"explore <areaName>\" area names are listed using the \"map\" command",
+			callback: exploreCommand,
 		},
 	}
 }
@@ -59,7 +64,7 @@ func startREPL(cfg *config) {
 		}
 		command := parsedCmd[0]
 		if cmd, ok := allCommands[command]; ok {
-			err := cmd.callback(cfg)
+			err := cmd.callback(cfg, parsedCmd)
 			if err != nil {
 				fmt.Println(err.Error())
 			}

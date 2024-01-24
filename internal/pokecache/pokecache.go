@@ -26,6 +26,9 @@ func NewCache(interval time.Duration) Cache {
 
 func (c *Cache) Add(key string, val []byte) {
 	c.mu.Lock()
+	if _, ok := c.cacheEntries[key]; ok {
+		return
+	}
 	c.cacheEntries[key] = CacheEntry{time.Now(), val}
 	c.mu.Unlock()
 }
