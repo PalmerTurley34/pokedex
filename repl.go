@@ -8,37 +8,35 @@ import (
 )
 
 type pokedexCmd struct {
-	name string
-	desc string
+	name     string
+	desc     string
 	callback func(*config) error
 }
 
 func getAllCommands() map[string]pokedexCmd {
 	return map[string]pokedexCmd{
 		"help": {
-			name: "help",
-			desc: "Displays all available commands",
+			name:     "help",
+			desc:     "Displays all available commands",
 			callback: helpCommand,
 		},
 		"exit": {
-			name: "exit",
-			desc: "Exits the Pokedex",
+			name:     "exit",
+			desc:     "Exits the Pokedex",
 			callback: exitCommand,
 		},
 		"map": {
-			name: "map",
-			desc: "Shows the next list of locations",
+			name:     "map",
+			desc:     "Shows the next list of locations",
 			callback: mapCommand,
 		},
 		"mapb": {
-			name: "mapb",
-			desc: "Shows the previous list of locations",
+			name:     "mapb",
+			desc:     "Shows the previous list of locations",
 			callback: mapbCommand,
 		},
 	}
 }
-
-
 
 func parseInput(input string) []string {
 	loweredInput := strings.ToLower(input)

@@ -4,7 +4,7 @@ import "testing"
 
 func TestParseInput(t *testing.T) {
 	cases := []struct {
-		input string
+		input    string
 		expected []string
 	}{
 		{
