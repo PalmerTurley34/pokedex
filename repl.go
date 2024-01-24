@@ -37,8 +37,13 @@ func getAllCommands() map[string]pokedexCmd {
 		},
 		"explore": {
 			name:     "explore",
-			desc:     "\"explore <areaName>\" area names are listed using the \"map\" command",
+			desc:     "explore a location area: \"explore <areaName>\". area names are listed using the \"map\" command",
 			callback: exploreCommand,
+		},
+		"catch": {
+			name:     "catch",
+			desc:     "attempt to catch a pokemon: \"catch <pokemonName>\". pokemon names are listed using the \"explore\" command",
+			callback: catchCommand,
 		},
 	}
 }

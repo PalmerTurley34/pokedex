@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
-
-	"github.com/PalmerTurley34/pokedex/internal/pokeapi"
-	// "log"
+	"time"
 )
 
 func helpCommand(cfg *config, parsedCmd []string) error {
@@ -19,23 +18,12 @@ func helpCommand(cfg *config, parsedCmd []string) error {
 
 func exitCommand(cfg *config, parsedCmd []string) error {
 	fmt.Println("\nGoodbye!")
-	cfg.pokeCache.Ticker.Stop()
 	os.Exit(0)
 	return nil
 }
 
-func mapCommand(cfg *config, parsedCmd []string) (err error) {
-	if cfg.nextLocationURL == nil {
-		return fmt.Errorf("reached last page, cannot go forward")
-	}
-	respBytes, ok := cfg.pokeCache.Get(*cfg.nextLocationURL)
-	if !ok {
-		respBytes, err = cfg.pokeapiClient.GetLocationAreas(cfg.nextLocationURL)
-		if err != nil {
-			return err
-		}
-	}
-	resp, err := pokeapi.UnmarshalLocationAreas(respBytes)
+func mapCommand(cfg *config, parsedCmd []string) error {
+	resp, err := cfg.pokeapiClient.GetLocationAreas(cfg.nextLocationURL)
 	if err != nil {
 		return err
 	}
@@ -43,50 +31,34 @@ func mapCommand(cfg *config, parsedCmd []string) (err error) {
 	for _, area := range resp.Results {
 		fmt.Printf(" - Area: %v\n", area.Name)
 	}
-	cfg.pokeCache.Add(*cfg.nextLocationURL, respBytes)
 	cfg.nextLocationURL = resp.Next
 	cfg.prevLocationAreaURL = resp.Previous
 	return nil
 }
 
-func mapbCommand(cfg *config, parsedCmd []string) (err error) {
+func mapbCommand(cfg *config, parsedCmd []string) error {
 	if cfg.prevLocationAreaURL == nil {
 		return fmt.Errorf("already at first page, cannot go back")
 	}
-	respBytes, ok := cfg.pokeCache.Get(*cfg.prevLocationAreaURL)
-	if !ok {
-		respBytes, err = cfg.pokeapiClient.GetLocationAreas(cfg.prevLocationAreaURL)
-		if err != nil {
-			return nil
-		}
-	}
-	resp, err := pokeapi.UnmarshalLocationAreas(respBytes)
+	resp, err := cfg.pokeapiClient.GetLocationAreas(cfg.prevLocationAreaURL)
 	if err != nil {
-		return err
+		return nil
 	}
 	fmt.Println("Previous Location Areas:")
 	for _, area := range resp.Results {
 		fmt.Printf(" - Area: %v\n", area.Name)
 	}
-	cfg.pokeCache.Add(*cfg.prevLocationAreaURL, respBytes)
 	cfg.nextLocationURL = resp.Next
 	cfg.prevLocationAreaURL = resp.Previous
 	return nil
 }
 
-func exploreCommand(cfg *config, parsedCmd []string) (err error) {
+func exploreCommand(cfg *config, parsedCmd []string) error {
 	if len(parsedCmd) != 2 {
 		return fmt.Errorf("explore takes exactly one area name")
 	}
 	areaName := parsedCmd[1]
-	respBytes, ok := cfg.pokeCache.Get(areaName)
-	if !ok {
-		respBytes, err = cfg.pokeapiClient.GetArea(areaName)
-		if err != nil {
-			return err
-		}
-	}
-	resp, err := pokeapi.UnmarshalArea(respBytes)
+	resp, err := cfg.pokeapiClient.GetArea(areaName)
 	if err != nil {
 		return err
 	}
@@ -94,6 +66,26 @@ func exploreCommand(cfg *config, parsedCmd []string) (err error) {
 	for _, pokemon := range resp.PokemonEncounters {
 		fmt.Printf(" - %v\n", pokemon.Pokemon.Name)
 	}
-	cfg.pokeCache.Add(areaName, respBytes)
+	return nil
+}
+
+func catchCommand(cfg *config, parsedCmd []string) error {
+	if len(parsedCmd) != 2 {
+		return fmt.Errorf("catch takes exactly one pokemon name")
+	}
+	pokemonName := parsedCmd[1]
+	pokemon, err := cfg.pokeapiClient.GetPokemon(pokemonName)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Throwing a Pokeball at the %v...\n", pokemon.Name)
+	const threshold = 60
+	randNum := rand.Intn(pokemon.BaseExperience)
+	time.Sleep(time.Second)
+	if randNum > threshold {
+		return fmt.Errorf("failed to catch the %v", pokemon.Name)
+	}
+	fmt.Printf("You caught a %v!\n", pokemon.Name)
+	cfg.pokedex[pokemonName] = pokemon
 	return nil
 }
