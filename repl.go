@@ -50,6 +50,11 @@ func getAllCommands() map[string]pokedexCmd {
 			desc:     "Inspect the stats of the given pokemon. (Can only inspect pokemon that are already caught).",
 			callback: inspectComand,
 		},
+		"pokedex": {
+			name:     "pokedex",
+			desc:     "Lists all the pokemon in your pokedex",
+			callback: pokedexCommand,
+		},
 	}
 }
 

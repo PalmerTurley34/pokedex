@@ -114,3 +114,13 @@ func inspectComand(cfg *config, parsedCmd []string) error {
 	fmt.Println("")
 	return nil
 }
+
+func pokedexCommand(cfg *config, parsedCmd []string) error {
+	if len(cfg.pokedex) == 0 {
+		return fmt.Errorf("pokedex is empty")
+	}
+	for name := range cfg.pokedex {
+		fmt.Printf(" - %v\n", name)
+	}
+	return nil
+}
