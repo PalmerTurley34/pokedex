@@ -27,23 +27,28 @@ func getAllCommands() map[string]pokedexCmd {
 		},
 		"map": {
 			name:     "map",
-			desc:     "Shows the next list of locations",
+			desc:     "Shows the next list of location areas",
 			callback: mapCommand,
 		},
 		"mapb": {
 			name:     "mapb",
-			desc:     "Shows the previous list of locations",
+			desc:     "Shows the previous list of location areas",
 			callback: mapbCommand,
 		},
 		"explore": {
-			name:     "explore",
-			desc:     "explore a location area: \"explore <areaName>\". area names are listed using the \"map\" command",
+			name:     "explore {loactionAreaName}",
+			desc:     "Lists the pokemon that appear in the given location area",
 			callback: exploreCommand,
 		},
 		"catch": {
-			name:     "catch",
-			desc:     "attempt to catch a pokemon: \"catch <pokemonName>\". pokemon names are listed using the \"explore\" command",
+			name:     "catch {pokemonName}",
+			desc:     "Attempt to catch a pokemon. Pokemon with higher `BaseExperience` are harder to catch.",
 			callback: catchCommand,
+		},
+		"inspect": {
+			name:     "inspect {pokemonName}",
+			desc:     "Inspect the stats of the given pokemon. (Can only inspect pokemon that are already caught).",
+			callback: inspectComand,
 		},
 	}
 }

@@ -89,3 +89,28 @@ func catchCommand(cfg *config, parsedCmd []string) error {
 	cfg.pokedex[pokemonName] = pokemon
 	return nil
 }
+
+func inspectComand(cfg *config, parsedCmd []string) error {
+	if len(parsedCmd) != 2 {
+		return fmt.Errorf("inspect command takes exactly one pokemon name")
+	}
+	pokemonName := parsedCmd[1]
+	pokemon, ok := cfg.pokedex[pokemonName]
+	if !ok {
+		return fmt.Errorf("you have not yet caught a %v. Catch one to add it to the pokedex", pokemonName)
+	}
+	fmt.Println("")
+	fmt.Println("Name:", pokemon.Name)
+	fmt.Println("Height:", pokemon.Height)
+	fmt.Println("Weight:", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf(" - %v: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, pokeType := range pokemon.Types {
+		fmt.Printf(" - %v\n", pokeType.Type.Name)
+	}
+	fmt.Println("")
+	return nil
+}
